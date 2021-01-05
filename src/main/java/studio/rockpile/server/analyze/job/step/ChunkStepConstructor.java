@@ -39,7 +39,8 @@ public class ChunkStepConstructor {
         BatchJobEnvironment jobEnv = DynamicBeanRegister.getBean(jobEnvBean, BatchJobEnvironment.class);
 
         String stepName = stepInfo.getStep().getStepCode();
-        ItemReader<Map<String, Object>> reader = readerBuilder.jdbcPagingReaderBuild(stepInfo, jobEnvBean);
+        // ItemReader<Map<String, Object>> reader = readerBuilder.jdbcPagingReaderBuild(stepInfo, jobEnvBean);
+        ItemReader<Map<String, Object>> reader = readerBuilder.jdbcCursorReaderBuild(stepInfo, jobEnvBean);
         jobEnv.getChunkReaderSet().put(stepName, reader);
         ItemProcessor<Map<String, Object>, Map<String, Object>> processor = processorBuilder.build(stepInfo, jobEnvBean);
         jobEnv.getChunkProcessorSet().put(stepName, processor);

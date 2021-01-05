@@ -12,6 +12,7 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
@@ -57,7 +58,7 @@ public class BatchDemoJob implements StepExecutionListener {
     }
 
     @Bean
-    public Job demoBatchJob() {
+    public Job demoBatchJob() throws Exception {
         long ts = Calendar.getInstance().getTimeInMillis();
         return jobBuilderFactory.get("demoBatchJob")
                 .start(demoItemStep())
@@ -71,7 +72,7 @@ public class BatchDemoJob implements StepExecutionListener {
     }
 
     @Bean
-    public Step simpleItemStep() {
+    public Step simpleItemStep() throws Exception {
         TaskletStep step = stepBuilderFactory.get("simple_item_step")
                 .listener(this)
                 .<Map<String, Object>, Map<String, Object>>chunk(FETCH_CHUNK_SIZE)
@@ -92,7 +93,7 @@ public class BatchDemoJob implements StepExecutionListener {
     }
 
     @Bean
-    public Step demoItemStep() {
+    public Step demoItemStep() throws Exception {
         long ts = Calendar.getInstance().getTimeInMillis();
         TaskletStep step = stepBuilderFactory.get("demo_item_step")
                 .listener(this)
@@ -109,7 +110,7 @@ public class BatchDemoJob implements StepExecutionListener {
 
     @Bean
     @StepScope
-    public ItemReader<? extends Map<String, Object>> accountPagingItemRead() {
+    public ItemReader<? extends Map<String, Object>> accountPagingItemRead() throws Exception {
         JdbcPagingItemReader<Map<String, Object>> itemReader = new JdbcPagingItemReader<>();
         itemReader.setDataSource(dataSource);
         itemReader.setFetchSize(FETCH_CHUNK_SIZE);
@@ -135,7 +136,7 @@ public class BatchDemoJob implements StepExecutionListener {
         sort.put("id", Order.ASCENDING);
         provider.setSortKeys(sort);
         itemReader.setQueryProvider(provider);
-
+        itemReader.afterPropertiesSet();
         return itemReader;
     }
 

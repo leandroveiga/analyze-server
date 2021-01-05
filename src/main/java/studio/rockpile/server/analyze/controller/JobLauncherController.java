@@ -1,6 +1,6 @@
 package studio.rockpile.server.analyze.controller;
 
-import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -8,23 +8,19 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import studio.rockpile.server.analyze.config.DynamicBeanRegister;
-import studio.rockpile.server.analyze.constant.DataTypeEnum;
 import studio.rockpile.server.analyze.constant.PublicDomainDef;
 import studio.rockpile.server.analyze.entity.JobNamedParam;
 import studio.rockpile.server.analyze.job.BatchJobConstructor;
 import studio.rockpile.server.analyze.job.BatchJobEnvironment;
 import studio.rockpile.server.analyze.job.JobParamConstructor;
-import studio.rockpile.server.analyze.job.example.JobMetaInfoExample;
+import studio.rockpile.server.analyze.example.JobMetaInfoExample;
 import studio.rockpile.server.analyze.protocol.CommonResult;
 import studio.rockpile.server.analyze.protocol.JobMetaInfo;
 import studio.rockpile.server.analyze.protocol.JobExecuteRequest;
 import studio.rockpile.server.analyze.util.SpringContextUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/jobLauncher")
@@ -61,13 +57,25 @@ public class JobLauncherController {
             // JobMetaInfo jobMetaInfo = jobMetaProvider.getMetaInfo(execReq.getJobId());
             // 测试数据模拟调用
             JobMetaInfo jobMetaInfo = JobMetaInfoExample.getMetaInfo();
-            String jobEnvBean = jobConstructor.build(jobMetaInfo);
 
+            // 动态注册当前作业的BatchJobEnvironment
+            Long workerId = IdWorker.getId();
+            String jobEnvBean = "job_" + String.valueOf(workerId);
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("workerId", workerId);
+            DynamicBeanRegister.registry(jobEnvBean, BatchJobEnvironment.class, properties);
+
+            // 注册命名参数
             Map<String, Object> args = execReq.getArgs();
             List<JobNamedParam> namedParams = jobMetaInfo.getNamedParams();
-            JobParameters params = paramConstructor.build(namedParams, args);
-
+            JobParameters params = paramConstructor.build(jobEnvBean, namedParams, args);
             BatchJobEnvironment jobEnv = DynamicBeanRegister.getBean(jobEnvBean, BatchJobEnvironment.class);
+            jobEnv.getRawsCache().setParams(params.getParameters());
+
+            // 构建作业
+            jobConstructor.build(jobEnvBean, jobMetaInfo);
+
+            // 启动任务，并把参数传递给任务
             JobExecution execution = jobLauncher.run(jobEnv.getJob(), params);
             long instanceId = execution.getJobInstance().getInstanceId();
             BatchStatus status = execution.getStatus();
@@ -83,16 +91,16 @@ public class JobLauncherController {
 
     }
 
-    // http://127.0.0.1:50306/analyze/jobLauncher/batch/demo/exec?message=rockpile
+    // http://127.0.0.1:50306/analyze/jobLauncher/batch/demo/exec?startId=5030606
     @RequestMapping(value = "/batch/demo/exec", method = RequestMethod.GET)
-    public CommonResult<?> execDemoBatchJob(@RequestParam(value = "message", required = true) String message) {
+    public CommonResult<?> execDemoBatchJob(@RequestParam(value = "startId", required = true) Long startId) {
         try {
             Date launchTime = Calendar.getInstance().getTime();
             JobParametersBuilder builder = new JobParametersBuilder();
             // JobParameter : { Object parameter, ParameterType parameterType }
             builder.addParameter(PublicDomainDef.JOB_LAUNCH_TIME_PARAM_KEY, new JobParameter(launchTime));
             builder.addParameter(PublicDomainDef.JOB_LAUNCH_DAY_PARAM_KEY, new JobParameter(Long.valueOf(formatter.format(launchTime))));
-            builder.addParameter("message", new JobParameter(message));
+            builder.addParameter("startId", new JobParameter(startId));
             JobParameters params = builder.toJobParameters();
 
             // 启动任务，并把参数传递给任务

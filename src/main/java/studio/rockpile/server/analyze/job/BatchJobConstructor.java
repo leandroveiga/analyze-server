@@ -75,14 +75,7 @@ public class BatchJobConstructor {
         }
     }
 
-    public String build(JobMetaInfo jobMetaInfo) throws Exception {
-        // 动态注册当前作业的BatchJobEnvironment
-        Long workerId = IdWorker.getId();
-        String jobEnvBean = "job_" + String.valueOf(workerId);
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("workerId", workerId);
-        DynamicBeanRegister.registry(jobEnvBean, BatchJobEnvironment.class, properties);
-
+    public String build(String jobEnvBean, JobMetaInfo jobMetaInfo) throws Exception {
         // 创建job涉及的Step
         buildSteps(jobMetaInfo, jobEnvBean);
         // 创建job

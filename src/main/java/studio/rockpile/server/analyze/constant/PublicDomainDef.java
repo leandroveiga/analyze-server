@@ -2,10 +2,9 @@ package studio.rockpile.server.analyze.constant;
 
 public class PublicDomainDef {
     public static final String RAWS_INDEX_KEY = "rawsKey";
-    public static final String JOB_LAUNCH_TIME_PARAM_KEY = "#launch_time";
-    public static final String JOB_LAUNCH_DAY_PARAM_KEY = "#launch_day";
-    public static final String JOB_LAUNCH_MONTH_PARAM_KEY = "#launch_month";
-    public static final String JOB_LAUNCH_YEAR_PARAM_KEY = "#launch_year";
+    public static final String JOB_LAUNCH_TIME_PARAM_KEY = "launchTime";
+    public static final String JOB_LAUNCH_DAY_PARAM_KEY = "launchDay";
+    public static final String JOB_ENV_BEAN_PARAM_KEY = "jobEnvBean";
     public static final Integer STEP_TYPE_STARTING = 1;
     public static final Integer STEP_TYPE_RELAYING = 2;
     public static final Integer STEP_TYPE_HANDLER = 3;

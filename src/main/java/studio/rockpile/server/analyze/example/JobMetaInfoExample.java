@@ -1,4 +1,4 @@
-package studio.rockpile.server.analyze.job.example;
+package studio.rockpile.server.analyze.example;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.*;
@@ -49,6 +49,25 @@ public class JobMetaInfoExample {
         monthParam.setDataType(DataTypeEnum.INTEGER.getAlias());
         namedParams.add(monthParam);
 
+        JobNamedParam startIdParam = new JobNamedParam();
+        startIdParam.setId(2021010613L);
+        startIdParam.setJobId(2021010601L);
+        startIdParam.setParamName("起始id");
+        startIdParam.setParamCode("start_id");
+        startIdParam.setRequire(false);
+        startIdParam.setDataType(DataTypeEnum.LONG.getAlias());
+        startIdParam.setDefaultValue("5030606");
+        namedParams.add(startIdParam);
+
+        JobNamedParam balanceParam = new JobNamedParam();
+        balanceParam.setId(2021010614L);
+        balanceParam.setJobId(2021010601L);
+        balanceParam.setParamName("账户余额");
+        balanceParam.setParamCode("balance");
+        balanceParam.setRequire(false);
+        balanceParam.setDataType(DataTypeEnum.DOUBLE.getAlias());
+        balanceParam.setDefaultValue("100.00");
+        namedParams.add(balanceParam);
         return namedParams;
     }
 
@@ -103,7 +122,7 @@ public class JobMetaInfoExample {
         conditionProperty.setCode("WhereClause");
         conditionProperty.setSeqNo(2);
         conditionProperty.setStepId(2021010621L);
-        conditionProperty.setContent("name like 'rockpile%' and type=1");
+        conditionProperty.setContent("name like 'rockpile%' and type=1 and id >= ? and balance >= ?");
         properties.add(conditionProperty);
 
         chunkStep.setProperties(properties);

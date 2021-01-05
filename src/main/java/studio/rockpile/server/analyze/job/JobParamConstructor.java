@@ -23,15 +23,15 @@ public class JobParamConstructor {
     private static final SimpleDateFormat formatter = new SimpleDateFormat(PublicDomainDef.DATE_FORMAT_DEFAULT_PATTERN);
     private static final SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyyMMdd");
 
-    public JobParameters build(List<JobNamedParam> namedParams, Map<String, Object> args) throws Exception {
+    public JobParameters build(String jobEnvBean, List<JobNamedParam> namedParams, Map<String, Object> args) throws Exception {
         // 生成job执行的命名参数实例
         Date launchTime = Calendar.getInstance().getTime();
         JobParametersBuilder builder = new JobParametersBuilder();
         // JobParameter : { Object parameter, ParameterType parameterType }
         Long day = Long.valueOf(dayFormatter.format(launchTime));
+        builder.addParameter(PublicDomainDef.JOB_LAUNCH_TIME_PARAM_KEY, new JobParameter(launchTime));
         builder.addParameter(PublicDomainDef.JOB_LAUNCH_DAY_PARAM_KEY, new JobParameter(day));
-        builder.addParameter(PublicDomainDef.JOB_LAUNCH_MONTH_PARAM_KEY, new JobParameter(day / 100));
-        builder.addParameter(PublicDomainDef.JOB_LAUNCH_YEAR_PARAM_KEY, new JobParameter(day / 10000));
+        builder.addParameter(PublicDomainDef.JOB_ENV_BEAN_PARAM_KEY, new JobParameter(jobEnvBean));
 
         for (int i = 0; i < namedParams.size(); i++) {
             JobNamedParam namedParam = namedParams.get(i);
