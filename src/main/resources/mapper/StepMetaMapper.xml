@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="studio.rockpile.server.analyze.dao.StepMetaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="studio.rockpile.server.analyze.entity.StepMeta">
+        <id column="id" property="id" />
+        <result column="step_title" property="stepTitle" />
+        <result column="step_code" property="stepCode" />
+        <result column="job_id" property="jobId" />
+        <result column="seg_node_type" property="segNodeType" />
+        <result column="rectangular_x" property="rectangularX" />
+        <result column="rectangular_y" property="rectangularY" />
+        <result column="decider_id" property="deciderId" />
+        <result column="step_type" property="stepType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, step_title, step_code, job_id, seg_node_type, rectangular_x, rectangular_y, decider_id, step_type
+    </sql>
+
+</mapper>

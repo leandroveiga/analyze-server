@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="studio.rockpile.server.analyze.dao.DeciderMetaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="studio.rockpile.server.analyze.entity.DeciderMeta">
+        <id column="id" property="id" />
+        <result column="decider_title" property="deciderTitle" />
+        <result column="decider_code" property="deciderCode" />
+        <result column="expression" property="expression" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, decider_title, decider_code, expression
+    </sql>
+
+</mapper>

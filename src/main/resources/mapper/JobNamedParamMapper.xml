@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="studio.rockpile.server.analyze.dao.JobNamedParamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="studio.rockpile.server.analyze.entity.JobNamedParam">
+        <result column="id" property="id" />
+        <result column="job_id" property="jobId" />
+        <result column="param_name" property="paramName" />
+        <result column="param_code" property="paramCode" />
+        <result column="data_type" property="dataType" />
+        <result column="default_value" property="defaultValue" />
+        <result column="is_require" property="isRequire" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, job_id, param_name, param_code, data_type, default_value, is_require
+    </sql>
+
+</mapper>
