@@ -2,7 +2,7 @@ package studio.rockpile.server.analyze.constant;
 
 public enum SegmentNodeTypeEnum {
     DB_TABLE_SELECT_CHUNK("db-tab-selector", "表数据分块查询"),
-    DATA_JOIN("data-join", "业务数据关联"),
+    BIZ_RELATION("biz-relation", "业务数据关联"),
     CALCULATOR("calculator", "计算器"),
     VALUE_MAPPER("val-mapper", "值映射"),
     COLUMN_SELECTOR("col-selector", "字段选择"),

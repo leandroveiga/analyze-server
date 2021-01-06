@@ -122,18 +122,18 @@ alter table t_account
     comment '账户';
 
 insert into t_account(id, name, type, balance, update_time)
-values (5030601, 'rockpile01', 1, 100.00, CURRENT_TIME),
-       (5030602, 'rockpile02', 1, 100.00, CURRENT_TIME),
-       (5030603, 'rockpile03', 1, 100.00, CURRENT_TIME),
-       (5030604, 'rockpile04', 1, 100.00, CURRENT_TIME),
-       (5030605, 'rockpile05', 1, 100.00, CURRENT_TIME),
-       (5030606, 'rockpile06', 1, 100.00, CURRENT_TIME),
-       (5030607, 'rockpile07', 1, 100.00, CURRENT_TIME),
-       (5030608, 'rockpile08', 1, 100.00, CURRENT_TIME),
-       (5030609, 'rockpile09', 1, 100.00, CURRENT_TIME),
-       (5030610, 'rockpile10', 1, 100.00, CURRENT_TIME),
-       (5030611, 'rockpile11', 1, 100.00, CURRENT_TIME),
-       (5030612, 'rockpile12', 1, 100.00, CURRENT_TIME),
-       (5030613, 'rockpile13', 1, 100.00, CURRENT_TIME);
+values (5030601, 'rockpile01', 1, 200.00, CURRENT_TIME),
+       (5030602, 'rockpile02', 1, 300.00, CURRENT_TIME),
+       (5030603, 'rockpile03', 1, 400.00, CURRENT_TIME),
+       (5030604, 'rockpile04', 1, 500.00, CURRENT_TIME),
+       (5030605, 'rockpile05', 1, 600.00, CURRENT_TIME),
+       (5030606, 'rockpile06', 1, 700.00, CURRENT_TIME),
+       (5030607, 'rockpile07', 1, 800.00, CURRENT_TIME),
+       (5030608, 'rockpile08', 1, 900.00, CURRENT_TIME),
+       (5030609, 'rockpile09', 1, 1000.00, CURRENT_TIME),
+       (5030610, 'rockpile10', 1, 1100.00, CURRENT_TIME),
+       (5030611, 'rockpile11', 1, 1200.00, CURRENT_TIME),
+       (5030612, 'rockpile12', 1, 1300.00, CURRENT_TIME),
+       (5030613, 'rockpile13', 1, 1400.00, CURRENT_TIME);
 
 

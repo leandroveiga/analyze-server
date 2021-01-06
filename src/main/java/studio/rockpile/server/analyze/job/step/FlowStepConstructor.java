@@ -57,12 +57,17 @@ public class FlowStepConstructor {
             DeciderMeta deciderMeta = stepMetaInfo.getDecider();
             String decideResult = null;
             if (deciderMeta == null) {
-                decideResult = StepDeciderBuilder.DECIDER_DEFAULT_RES;
+                // decideResult = StepDeciderBuilder.DECIDER_DEFAULT_RES;
+                // 全数据决策匹配，使用当前节点名作为决策器结果
+                decideResult = stepMetaInfo.getStep().getStepCode();
             } else {
                 String expression = deciderMeta.getExpression();
                 // 解析expression表达式，获取决策结果
                 // 按逻辑规则计算结果设置决策器，引入avaitor表达式引擎
-                decideResult = StepDeciderBuilder.DECIDER_DEFAULT_RES;
+                // 这里模拟数据走VIP-A分支
+                if( deciderMeta.getId()==3021010623L ){
+                    decideResult = "VIP-A";
+                }
             }
             ExecutionContext context = stepContext.getStepExecution().getExecutionContext();
             context.putString(StepDeciderBuilder.DECIDER_RES_CONTEXT_PARAM_NAME, decideResult);
@@ -71,6 +76,7 @@ public class FlowStepConstructor {
         }).build();
 
         if (!isEnding) {
+            // 配置的决策器为null，表示全数据匹配
             BatchJobEnvironment jobEnv = DynamicBeanRegister.getBean(jobEnvBean, BatchJobEnvironment.class);
             // 设置决策器校验Result
             DeciderMeta deciderMeta = stepMetaInfo.getDecider();

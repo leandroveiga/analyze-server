@@ -18,14 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class JobMetaInfoExample {
-    private static ObjectMapper jsonMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true) // 序列化时忽略transient属性
-            .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL).configure(SerializationFeature.INDENT_OUTPUT, false)
-            .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
-            .registerModule(new SimpleModule().addSerializer(Long.class, ToStringSerializer.instance)
-                    .addSerializer(Long.TYPE, ToStringSerializer.instance));
-
     private static Map<Long, StepLinkMeta> demoLinkHash = new HashMap<>();
 
     private static List<JobNamedParam> jobNamedParam() throws Exception {
@@ -56,7 +48,7 @@ public class JobMetaInfoExample {
         startIdParam.setParamCode("start_id");
         startIdParam.setRequire(false);
         startIdParam.setDataType(DataTypeEnum.LONG.getAlias());
-        startIdParam.setDefaultValue("5030606");
+        startIdParam.setDefaultValue("5030600");
         namedParams.add(startIdParam);
 
         JobNamedParam balanceParam = new JobNamedParam();
@@ -76,7 +68,7 @@ public class JobMetaInfoExample {
         StepMeta step = new StepMeta();
         step.setId(2021010621L);
         step.setStepTitle("从表单库获取填报信息");
-        step.setStepCode("affair_form_fill_data");
+        step.setStepCode("affairFormFillData");
         step.setJobId(2021010601L);
         step.setSegNodeType(SegmentNodeTypeEnum.DB_TABLE_SELECT_CHUNK.getKey());
         step.setRectangularX(100);
@@ -102,7 +94,7 @@ public class JobMetaInfoExample {
         List<StepProperty> properties = new ArrayList<>();
 
         StepProperty columnProperty = new StepProperty();
-        columnProperty.setId(10210106211L);
+        columnProperty.setId(10210106210L);
         columnProperty.setCode("SelectClause");
         columnProperty.setSeqNo(0);
         columnProperty.setStepId(2021010621L);
@@ -110,7 +102,7 @@ public class JobMetaInfoExample {
         properties.add(columnProperty);
 
         StepProperty tableProperty = new StepProperty();
-        tableProperty.setId(10210106210L);
+        tableProperty.setId(10210106211L);
         tableProperty.setCode("FromClause");
         tableProperty.setSeqNo(1);
         tableProperty.setStepId(2021010621L);
@@ -129,18 +121,19 @@ public class JobMetaInfoExample {
         return chunkStep;
     }
 
-    private static StepMetaInfo calculatorStepA() throws Exception {
+    private static StepMetaInfo bizRelationStep() throws Exception {
         StepMetaInfo flowStep = new StepMetaInfo();
         StepMeta step = new StepMeta();
         step.setId(2021010622L);
-        step.setStepTitle("计算器处理节点A");
-        step.setStepCode("calculator");
+        step.setStepTitle("业务数据关联");
+        step.setStepCode("bizRelation");
         step.setJobId(2021010601L);
-        step.setSegNodeType(SegmentNodeTypeEnum.CALCULATOR.getKey());
+        step.setSegNodeType(SegmentNodeTypeEnum.BIZ_RELATION.getKey());
         step.setRectangularX(300);
         step.setRectangularY(100);
         step.setDeciderId(null);
         step.setStepType(2); /*步骤类型：1起始 9结束 2接续 3处理节点*/
+
         flowStep.setStep(step);
         flowStep.setDecider(null);
         flowStep.setStatus(StepStatusEnum.INIT);
@@ -151,7 +144,7 @@ public class JobMetaInfoExample {
         StepLinkMeta link = new StepLinkMeta();
         link.setId(20210106221L);
         link.setStepFromId(2021010622L);
-        link.setStepToId(2021010629L); // 控制台输出节点
+        link.setStepToId(2021010623L); // 控制台输出节点
         link.setDeciderResult("*");
         demoLinkHash.put(20210106221L, link);
 
@@ -160,8 +153,138 @@ public class JobMetaInfoExample {
         flowStep.setNextLinks(nextLinks);
 
         List<StepProperty> properties = new ArrayList<>();
+        StepProperty property = new StepProperty();
+        property.setId(10210106220L);
+        property.setCode("relation");
+        property.setSeqNo(0);
+        property.setStepId(2021010622L);
+        property.setContent("[{\"label\":1,\"value\":\"买家\"},{\"label\":2,\"value\":\"卖家\"}]");
+        properties.add(property);
         flowStep.setProperties(properties);
         return flowStep;
+    }
+
+    private static StepMetaInfo calculatorStep() throws Exception {
+        StepMetaInfo flowStep = new StepMetaInfo();
+        StepMeta step = new StepMeta();
+        step.setId(2021010623L);
+        step.setStepTitle("VIP计算");
+        step.setStepCode("calculator");
+        step.setJobId(2021010601L);
+        step.setSegNodeType(SegmentNodeTypeEnum.CALCULATOR.getKey());
+        step.setRectangularX(500);
+        step.setRectangularY(100);
+        step.setStepType(3); /*步骤类型：1起始 9结束 2接续 3处理节点*/
+
+        DeciderMeta decider = new DeciderMeta();
+        decider.setId(3021010623L);
+        decider.setDeciderTitle("VIP等级决策器");
+        decider.setDeciderCode("VipLevelDecider");
+        decider.setExpression("balance>1000? 'VIP-A':'VIP-B'");
+        flowStep.setDecider(decider);
+
+        step.setDeciderId(3021010623L);
+        flowStep.setStep(step);
+        flowStep.setDecider(decider);
+        flowStep.setStatus(StepStatusEnum.INIT);
+        List<Long> previousLinks = new ArrayList<>();
+        previousLinks.add(20210106221L);
+        flowStep.setPreviousLinks(previousLinks);
+
+        StepLinkMeta link1 = new StepLinkMeta();
+        link1.setId(20210106231L);
+        link1.setStepFromId(2021010623L);
+        link1.setStepToId(2021010625L); // 信用等级A 值映射
+        link1.setDeciderResult("VIP-A"); // 信用度等级A
+        demoLinkHash.put(20210106231L, link1);
+
+        StepLinkMeta link2 = new StepLinkMeta();
+        link2.setId(20210106232L);
+        link2.setStepFromId(2021010623L);
+        link2.setStepToId(2021010626L); // 信用等级B 值映射
+        link2.setDeciderResult("VIP-B"); // 信用度等级B
+        demoLinkHash.put(20210106232L, link2);
+
+        List<Long> nextLinks = new ArrayList<>();
+        nextLinks.add(20210106231L);
+        nextLinks.add(20210106232L);
+        flowStep.setNextLinks(nextLinks);
+
+        List<StepProperty> properties = new ArrayList<>();
+        flowStep.setProperties(properties);
+        return flowStep;
+    }
+
+    private static StepMetaInfo consoleOutVipA() throws Exception {
+        StepMetaInfo consoleOutput = new StepMetaInfo();
+        StepMeta step = new StepMeta();
+        step.setId(2021010625L);
+        step.setStepTitle("控制台输出 VIP-A");
+        step.setStepCode("consoleOutputVipA");
+        step.setJobId(2021010601L);
+        step.setSegNodeType(SegmentNodeTypeEnum.CONSOLE_OUTPUT.getKey());
+        step.setRectangularX(700);
+        step.setRectangularY(100);
+        step.setDeciderId(null);
+        step.setStepType(3); /*步骤类型：1起始 9结束 2接续 3处理节点*/
+        consoleOutput.setStep(step);
+        consoleOutput.setDecider(null);
+        consoleOutput.setStatus(StepStatusEnum.INIT);
+
+        List<Long> previousLinks = new ArrayList<>();
+        previousLinks.add(20210106231L);
+        consoleOutput.setPreviousLinks(previousLinks);
+
+        StepLinkMeta link1 = new StepLinkMeta();
+        link1.setId(20210106251L);
+        link1.setStepFromId(2021010625L);
+        link1.setStepToId(2021010629L); // 结束节点
+        link1.setDeciderResult("*");
+        demoLinkHash.put(20210106251L, link1);
+
+        List<Long> nextLinks = new ArrayList<>();
+        nextLinks.add(20210106251L);
+        consoleOutput.setNextLinks(nextLinks);
+
+        List<StepProperty> properties = new ArrayList<>();
+        consoleOutput.setProperties(properties);
+        return consoleOutput;
+    }
+
+    private static StepMetaInfo consoleOutVipB() throws Exception {
+        StepMetaInfo consoleOutput = new StepMetaInfo();
+        StepMeta step = new StepMeta();
+        step.setId(2021010626L);
+        step.setStepTitle("控制台输出 VIP-B");
+        step.setStepCode("consoleOutputVipB");
+        step.setJobId(2021010601L);
+        step.setSegNodeType(SegmentNodeTypeEnum.CONSOLE_OUTPUT.getKey());
+        step.setRectangularX(700);
+        step.setRectangularY(300);
+        step.setDeciderId(null);
+        step.setStepType(3); /*步骤类型：1起始 9结束 2接续 3处理节点*/
+        consoleOutput.setStep(step);
+        consoleOutput.setDecider(null);
+        consoleOutput.setStatus(StepStatusEnum.INIT);
+
+        List<Long> previousLinks = new ArrayList<>();
+        previousLinks.add(20210106232L);
+        consoleOutput.setPreviousLinks(previousLinks);
+
+        StepLinkMeta link1 = new StepLinkMeta();
+        link1.setId(20210106261L);
+        link1.setStepFromId(2021010626L);
+        link1.setStepToId(2021010629L); // 结束节点
+        link1.setDeciderResult("*");
+        demoLinkHash.put(20210106261L, link1);
+
+        List<Long> nextLinks = new ArrayList<>();
+        nextLinks.add(20210106261L);
+        consoleOutput.setNextLinks(nextLinks);
+
+        List<StepProperty> properties = new ArrayList<>();
+        consoleOutput.setProperties(properties);
+        return consoleOutput;
     }
 
     private static StepMetaInfo consoleOut() throws Exception {
@@ -169,19 +292,22 @@ public class JobMetaInfoExample {
         StepMeta step = new StepMeta();
         step.setId(2021010629L);
         step.setStepTitle("控制台输出节点");
-        step.setStepCode("console-output");
+        step.setStepCode("consoleOutput");
         step.setJobId(2021010601L);
         step.setSegNodeType(SegmentNodeTypeEnum.CONSOLE_OUTPUT.getKey());
-        step.setRectangularX(500);
+        step.setRectangularX(900);
         step.setRectangularY(100);
         step.setDeciderId(null);
         step.setStepType(9); /*步骤类型：1起始 9结束 2接续*/
         consoleOutput.setStep(step);
         consoleOutput.setDecider(null);
         consoleOutput.setStatus(StepStatusEnum.INIT);
+
         List<Long> previousLinks = new ArrayList<>();
-        previousLinks.add(20210106221L);
+        previousLinks.add(20210106251L);
+        previousLinks.add(20210106261L);
         consoleOutput.setPreviousLinks(previousLinks);
+
         consoleOutput.setNextLinks(null);
 
         List<StepProperty> properties = new ArrayList<>();
@@ -206,13 +332,32 @@ public class JobMetaInfoExample {
 
         List<StepMetaInfo> steps = new ArrayList<>();
         steps.add(chunkStep()); // 表数据分块查询
-        steps.add(calculatorStepA()); // 计算器节点A
+        steps.add(bizRelationStep()); // 业务数据关联
+        steps.add(calculatorStep()); // VIP等级计算
+        steps.add(consoleOutVipA()); // VIP-A
+        steps.add(consoleOutVipB()); // VIP-B
         steps.add(consoleOut()); // 控制台输出节点
         jobMetaInfo.setSteps(steps);
 
         jobMetaInfo.setLinkHash(demoLinkHash);
-        String json = jsonMapper.writeValueAsString(jobMetaInfo);
-        System.out.println("... json : " + json);
         return jobMetaInfo;
+    }
+
+    public static void main(String[] args) {
+        try {
+            ObjectMapper jsonMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true) // 序列化时忽略transient属性
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .setSerializationInclusion(JsonInclude.Include.NON_NULL).configure(SerializationFeature.INDENT_OUTPUT, false)
+                    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                    .registerModule(new SimpleModule().addSerializer(Long.class, ToStringSerializer.instance)
+                            .addSerializer(Long.TYPE, ToStringSerializer.instance));
+
+            JobMetaInfo jobMetaInfo = JobMetaInfoExample.getMetaInfo();
+            String json = jsonMapper.writeValueAsString(jobMetaInfo);
+            System.out.println("... json : " + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
