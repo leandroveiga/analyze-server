@@ -58,7 +58,7 @@ public class FlowStepConstructor {
             String decideResult = null;
             if (deciderMeta == null) {
                 // decideResult = StepDeciderBuilder.DECIDER_DEFAULT_RES;
-                // 全数据决策匹配，使用当前节点名作为决策器结果
+                // 全数据决策匹配，使用当前节点id作为决策器结果
                 decideResult = stepMetaInfo.getStep().getStepCode();
             } else {
                 String expression = deciderMeta.getExpression();
