@@ -35,6 +35,10 @@ public class FlowStepListener implements StepExecutionListener {
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         logger.debug("... after flow Step({})", stepExecution.getStepName());
+        if (!stepExecution.getJobParameters().getParameters().containsKey(PublicDomainDef.JOB_ENV_BEAN_PARAM_KEY)) {
+            return ExitStatus.COMPLETED;
+        }
+
         String jobEnvBean = stepExecution.getJobParameters().getParameters()
                 .get(PublicDomainDef.JOB_ENV_BEAN_PARAM_KEY).getValue().toString();
         BatchJobEnvironment jobEnv = DynamicBeanRegister.getBean(jobEnvBean, BatchJobEnvironment.class);

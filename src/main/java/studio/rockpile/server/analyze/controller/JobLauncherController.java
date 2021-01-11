@@ -104,7 +104,8 @@ public class JobLauncherController {
             JobParameters params = builder.toJobParameters();
 
             // 启动任务，并把参数传递给任务
-            JobExecution execution = jobLauncher.run(SpringContextUtil.getBean("demoBatchJob", Job.class), params);
+            // JobExecution execution = jobLauncher.run(SpringContextUtil.getBean("demoBatchJob", Job.class), params);
+            JobExecution execution = jobLauncher.run(SpringContextUtil.getBean("demoPagingJob", Job.class), params);
             long instanceId = execution.getJobInstance().getInstanceId();
             BatchStatus status = execution.getStatus();
             if (BatchStatus.FAILED.equals(status)) {

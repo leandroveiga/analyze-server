@@ -12,10 +12,10 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
+import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +28,7 @@ import studio.rockpile.server.analyze.job.listener.ChunkStepListener;
 import studio.rockpile.server.analyze.job.listener.FlowStepListener;
 import studio.rockpile.server.analyze.job.step.ItemChunkWriter;
 import studio.rockpile.server.analyze.job.step.ItemFilterProcessor;
+import studio.rockpile.server.analyze.job.step.ItemUpperCaseProcessor;
 import studio.rockpile.server.analyze.util.SpringContextUtil;
 
 import javax.sql.DataSource;
@@ -59,7 +60,6 @@ public class BatchDemoJob implements StepExecutionListener {
 
     @Bean
     public Job demoBatchJob() throws Exception {
-        long ts = Calendar.getInstance().getTimeInMillis();
         return jobBuilderFactory.get("demoBatchJob")
                 .start(demoItemStep())
                 .next(demoFlowStepA())
@@ -99,13 +99,25 @@ public class BatchDemoJob implements StepExecutionListener {
                 .listener(this)
                 .<Map<String, Object>, Map<String, Object>>chunk(FETCH_CHUNK_SIZE) /*chunkSize=20表示读取完20个数据，再进行输出处理，泛型中指定了输入输出的类型*/
                 .faultTolerant()
-                .listener(chunkStepListener) /*chunk级别的监听*/
+                // .listener(chunkStepListener) /*chunk级别的监听*/
                 .reader(accountPagingItemRead())
                 // 一个ItemStep只能注册一个processor
-                .processor(SpringContextUtil.getBean("itemFilterProcessor", ItemFilterProcessor.class))
+                // .processor(SpringContextUtil.getBean("itemFilterProcessor", ItemFilterProcessor.class))
+                .processor(demoItemCompositeProcessor())
                 .writer(SpringContextUtil.getBean("itemChunkWriter", ItemChunkWriter.class))
                 .build();
         return step;
+    }
+
+    @Bean
+    public CompositeItemProcessor<Map<String, Object>, Map<String, Object>> demoItemCompositeProcessor() {
+        CompositeItemProcessor<Map<String, Object>, Map<String, Object>> compositeProcessor = new CompositeItemProcessor<>();
+
+        List<ItemProcessor<Map<String, Object>, Map<String, Object>>> processors = new ArrayList<>();
+        processors.add(SpringContextUtil.getBean("itemUpperCaseProcessor", ItemUpperCaseProcessor.class));
+        processors.add(SpringContextUtil.getBean("itemFilterProcessor", ItemFilterProcessor.class));
+        compositeProcessor.setDelegates(processors);
+        return compositeProcessor;
     }
 
     @Bean
